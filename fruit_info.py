@@ -2,11 +2,37 @@ import pandas as pd
 import streamlit as st
 from streamlit_extras.stylable_container import stylable_container
 
-from data import df_with_filters, display_table, fruit_data, update_fruit_data
+from data import df_with_filters, fruit_data, update_fruit_data
 
 st.markdown(
     "<h1 style='text-align: center;'>Информация о плодах</h1>", unsafe_allow_html=True
 )
+
+if "insert_state" not in st.session_state:
+    st.session_state.insert_state = False
+if "change_state" not in st.session_state:
+    st.session_state.change_state = False
+if "output_state" not in st.session_state:
+    st.session_state.output_state = False
+
+
+def _hide_all_except_insert() -> None:
+    """Скрывает содержимое под кнопками 'Изменить' и 'Вывести'."""
+    st.session_state.output_state = False
+    st.session_state.change_state = False
+
+
+def _hide_all_except_change() -> None:
+    """Скрывает содержимое под кнопками 'Вывести' и 'Вставить'."""
+    st.session_state.output_state = False
+    st.session_state.insert_state = False
+
+
+def _hide_all_except_output() -> None:
+    """Скрывает содержимое под кнопками 'Вставить' и 'Изменить'."""
+    st.session_state.insert_state = False
+    st.session_state.change_state = False
+
 
 with stylable_container(
     "green",
@@ -16,16 +42,10 @@ with stylable_container(
         color: black;
     }""",
 ):
-    insert = st.button("Ввести")
-
-if "insert_state" not in st.session_state:
-    st.session_state.insert_state = False
+    insert = st.button("Ввести", on_click=_hide_all_except_insert)
 
 if insert or st.session_state.insert_state:
     st.session_state.insert_state = True
-    st.session_state.output_state = False
-    st.session_state.change_state = False
-
     with st.form(key="fruits_info"):
         day_name = st.radio(
             "День недели",
@@ -64,7 +84,6 @@ if insert or st.session_state.insert_state:
             else:
                 st.warning("Пожалуйста, заполните все поля.")
 
-
 with stylable_container(
     "red",
     css_styles="""
@@ -73,16 +92,10 @@ with stylable_container(
         color: black;
     }""",
 ):
-    change = st.button("Изменить")
-
-if "change_state" not in st.session_state:
-    st.session_state.change_state = False
+    change = st.button("Изменить", on_click=_hide_all_except_change)
 
 if change or st.session_state.change_state:
     st.session_state.change_state = True
-    st.session_state.insert_state = False
-    st.session_state.output_state = False
-
     st.data_editor(fruit_data)
 
 with stylable_container(
@@ -93,16 +106,10 @@ with stylable_container(
         color: black;
     }""",
 ):
-    output = st.button("Вывести", on_click=display_table)
-
-if "output_state" not in st.session_state:
-    st.session_state.output_state = False
+    output = st.button("Вывести", on_click=_hide_all_except_output)
 
 if output or st.session_state.output_state:
     st.session_state.output_state = True
-    st.session_state.change_state = False
-    st.session_state.insert_state = False
-
     df_with_filters.display_filters()
     df_with_filters.display_df()
 
