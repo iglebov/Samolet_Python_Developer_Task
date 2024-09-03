@@ -2,12 +2,14 @@ import pandas as pd
 import streamlit as st
 from streamlit_extras.stylable_container import stylable_container
 
-from data import df_with_filters, fruit_data, update_fruit_data
+from FruitFrame import FruitFrame
 
 st.markdown(
     "<h1 style='text-align: center;'>Информация о плодах</h1>", unsafe_allow_html=True
 )
 
+if "fruit_frame" not in st.session_state:
+    st.session_state["fruit_frame"] = FruitFrame()
 if "insert_state" not in st.session_state:
     st.session_state.insert_state = False
 if "change_state" not in st.session_state:
@@ -77,9 +79,7 @@ if insert or st.session_state.insert_state:
                         "Кол-во фруктов": fruits_number,
                     }
                 )
-                update_fruit_data(
-                    pd.concat([fruit_data, pd.DataFrame([row], columns=row.index)])
-                )
+                st.session_state["fruit_frame"].insert(row)
                 st.success("Информация успешно добавлена!")
             else:
                 st.warning("Пожалуйста, заполните все поля.")
@@ -96,7 +96,7 @@ with stylable_container(
 
 if change or st.session_state.change_state:
     st.session_state.change_state = True
-    st.data_editor(fruit_data)
+    st.session_state["fruit_frame"].change(st)
 
 with stylable_container(
     "blue",
@@ -110,7 +110,6 @@ with stylable_container(
 
 if output or st.session_state.output_state:
     st.session_state.output_state = True
-    df_with_filters.display_filters()
-    df_with_filters.display_df()
+    st.session_state["fruit_frame"].output()
 
 # TODO: Добавить график (pandas y - количество фруктов, x - день)
