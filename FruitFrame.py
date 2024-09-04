@@ -15,8 +15,7 @@ class FruitFrame:
             data=[],
         )
 
-    @staticmethod
-    def form(st: streamlit):
+    def form(self, st: streamlit):
         with st.form(key="fruits_info"):
             day_name = st.radio(
                 "День недели",
@@ -40,7 +39,7 @@ class FruitFrame:
                             "Кол-во фруктов": fruits_number,
                         }
                     )
-                    st.session_state["fruit_frame"].insert(series)
+                    self.insert(series)
                     st.success("Информация успешно добавлена!")
                 else:
                     st.warning("Пожалуйста, заполните все поля.")
