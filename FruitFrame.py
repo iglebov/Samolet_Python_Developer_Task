@@ -21,7 +21,7 @@ class FruitFrame:
                 "День недели",
                 *DAYS_FOR_RADIO_BUTTON,
             )
-            tree_name = st.text_input(label="Название дерева (Например: 'Яблоня')")
+            tree_name = st.text_input(label="Название дерева (Например: Яблоня)")
             fruits_number = st.number_input(
                 label="Число плодов (Например: 1)", min_value=1, value=1
             )
