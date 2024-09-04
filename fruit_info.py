@@ -1,19 +1,21 @@
-import pandas as pd
 import streamlit as st
 from streamlit_extras.stylable_container import stylable_container
 
 from constants import (
     CHANGE_BUTTON_CSS_STYLE,
-    DAYS_FOR_RADIO_BUTTON,
-    INPUT_BUTTON_CSS_STYLE,
+    CLEAR_BUTTON_CSS_STYLE,
+    INSERT_BUTTON_CSS_STYLE,
     OUTPUT_BUTTON_CSS_STYLE,
     PLOT_BUTTON_CSS_STYLE,
+    RANDOM_BUTTON_CSS_STYLE,
 )
 from FruitFrame import FruitFrame
 
 st.markdown(
     "<h1 style='text-align: center;'>Информация о плодах</h1>", unsafe_allow_html=True
 )
+
+st.markdown("###")
 
 if "fruit_frame" not in st.session_state:
     st.session_state["fruit_frame"] = FruitFrame()
@@ -25,71 +27,75 @@ if "output_state" not in st.session_state:
     st.session_state.output_state = False
 if "plot_state" not in st.session_state:
     st.session_state.plot_state = False
+if "random_state" not in st.session_state:
+    st.session_state.random_state = False
+if "clear_state" not in st.session_state:
+    st.session_state.clear_state = False
 
 
 def _hide_all_except_insert() -> None:
-    """Скрывает содержимое под кнопками 'Изменить' и 'Вывести'."""
+    """Скрывает содержимое всех кнопок, кроме 'Ввести'."""
     st.session_state.output_state = False
     st.session_state.change_state = False
     st.session_state.plot_state = False
+    st.session_state.clear_state = False
+    st.session_state.random_state = False
 
 
 def _hide_all_except_change() -> None:
-    """Скрывает содержимое под кнопками 'Вывести' и 'Вставить'."""
+    """Скрывает содержимое всех кнопок, кроме 'Изменить'."""
     st.session_state.output_state = False
     st.session_state.insert_state = False
     st.session_state.plot_state = False
+    st.session_state.clear_state = False
+    st.session_state.random_state = False
 
 
 def _hide_all_except_output() -> None:
-    """Скрывает содержимое под кнопками 'Вставить' и 'Изменить'."""
+    """Скрывает содержимое всех кнопок, кроме 'Вывести'."""
     st.session_state.insert_state = False
     st.session_state.change_state = False
     st.session_state.plot_state = False
+    st.session_state.clear_state = False
+    st.session_state.random_state = False
 
 
 def _hide_all_except_plot() -> None:
-    """Скрывает содержимое под кнопками 'Вставить' и 'Изменить'."""
+    """Скрывает содержимое всех кнопок, кроме 'График'."""
     st.session_state.insert_state = False
     st.session_state.change_state = False
     st.session_state.output_state = False
+    st.session_state.clear_state = False
+    st.session_state.random_state = False
+
+
+def _hide_all_except_random() -> None:
+    """Скрывает содержимое всех кнопок, кроме 'Случайные данные'."""
+    st.session_state.insert_state = False
+    st.session_state.change_state = False
+    st.session_state.output_state = False
+    st.session_state.plot_state = False
+    st.session_state.clear_state = False
+
+
+def _hide_all_except_clear() -> None:
+    """Скрывает содержимое всех кнопок, кроме 'Очистить'."""
+    st.session_state.insert_state = False
+    st.session_state.change_state = False
+    st.session_state.output_state = False
+    st.session_state.plot_state = False
+    st.session_state.random_state = False
 
 
 with stylable_container(
     "green",
-    css_styles=INPUT_BUTTON_CSS_STYLE,
+    css_styles=INSERT_BUTTON_CSS_STYLE,
 ):
     insert = st.button("Ввести", on_click=_hide_all_except_insert)
 
 if insert or st.session_state.insert_state:
     st.session_state.insert_state = True
-    with st.form(key="fruits_info"):
-        day_name = st.radio(
-            "День недели",
-            *DAYS_FOR_RADIO_BUTTON,
-        )
-        tree_name = st.text_input(label="Название дерева (Например: 'Яблоня')")
-        fruits_number = st.number_input(
-            label="Число плодов (Например: 1)", min_value=0, value=0
-        )
-
-        submit_form = st.form_submit_button(label="Добавить информацию")
-
-        if submit_form:
-            st.write(submit_form)
-
-            if tree_name:
-                row = pd.Series(
-                    {
-                        "День недели": day_name,
-                        "Название дерева": tree_name,
-                        "Кол-во фруктов": fruits_number,
-                    }
-                )
-                st.session_state["fruit_frame"].insert(row)
-                st.success("Информация успешно добавлена!")
-            else:
-                st.warning("Пожалуйста, заполните все поля.")
+    st.session_state["fruit_frame"].form(st)
 
 with stylable_container(
     "red",
@@ -119,11 +125,26 @@ with stylable_container(
 
 if plot or st.session_state.plot_state:
     st.session_state.plot_state = True
-    st.bar_chart(
-        st.session_state["fruit_frame"].data,
-        x="День недели",
-        y="Кол-во фруктов",
-        x_label="День недели",
-        y_label="Кол-во фруктов",
-        color="Название дерева",
-    )
+    st.session_state["fruit_frame"].plot(st)
+
+with stylable_container(
+    "pink",
+    css_styles=RANDOM_BUTTON_CSS_STYLE,
+):
+    random = st.button("Случайные данные", on_click=_hide_all_except_random)
+
+if random or st.session_state.random_state:
+    st.session_state.random_state = True
+    st.session_state["fruit_frame"].random()
+    st.success("Добавлено 10 случайных строк!")
+
+with stylable_container(
+    "dark",
+    css_styles=CLEAR_BUTTON_CSS_STYLE,
+):
+    clear = st.button("Очистить", on_click=_hide_all_except_clear)
+
+if clear or st.session_state.clear_state:
+    st.session_state.clear_state = True
+    st.session_state["fruit_frame"].clear()
+    st.success("Таблица очищена")
