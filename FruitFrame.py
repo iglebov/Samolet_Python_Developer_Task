@@ -23,7 +23,7 @@ class FruitFrame:
             )
             tree_name = st.text_input(label="Название дерева (Например: 'Яблоня')")
             fruits_number = st.number_input(
-                label="Число плодов (Например: 1)", min_value=0, value=0
+                label="Число плодов (Например: 1)", min_value=1, value=1
             )
 
             submit_form = st.form_submit_button(label="Добавить информацию")
