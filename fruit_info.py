@@ -8,90 +8,34 @@ from constants import (
     OUTPUT_BUTTON_CSS_STYLE,
     PLOT_BUTTON_CSS_STYLE,
     RANDOM_BUTTON_CSS_STYLE,
+    STATES,
 )
 from FruitFrame import FruitFrame
 
-st.markdown(
-    "<h1 style='text-align: center;'>Информация о плодах</h1>", unsafe_allow_html=True
-)
+_, col, _ = st.columns([1, 4, 1])
 
-st.markdown("###")
+with col:
+    st.title("Информация о плодах")
+
 
 if "fruit_frame" not in st.session_state:
     st.session_state["fruit_frame"] = FruitFrame()
-if "insert_state" not in st.session_state:
-    st.session_state.insert_state = False
-if "change_state" not in st.session_state:
-    st.session_state.change_state = False
-if "output_state" not in st.session_state:
-    st.session_state.output_state = False
-if "plot_state" not in st.session_state:
-    st.session_state.plot_state = False
-if "random_state" not in st.session_state:
-    st.session_state.random_state = False
-if "clear_state" not in st.session_state:
-    st.session_state.clear_state = False
+for state in STATES:
+    if state not in st.session_state:
+        setattr(st.session_state, state, False)
 
 
-def _hide_all_except_insert() -> None:
-    """Скрывает содержимое всех кнопок, кроме 'Ввести'."""
-    st.session_state.output_state = False
-    st.session_state.change_state = False
-    st.session_state.plot_state = False
-    st.session_state.clear_state = False
-    st.session_state.random_state = False
-
-
-def _hide_all_except_change() -> None:
-    """Скрывает содержимое всех кнопок, кроме 'Изменить'."""
-    st.session_state.output_state = False
-    st.session_state.insert_state = False
-    st.session_state.plot_state = False
-    st.session_state.clear_state = False
-    st.session_state.random_state = False
-
-
-def _hide_all_except_output() -> None:
-    """Скрывает содержимое всех кнопок, кроме 'Вывести'."""
-    st.session_state.insert_state = False
-    st.session_state.change_state = False
-    st.session_state.plot_state = False
-    st.session_state.clear_state = False
-    st.session_state.random_state = False
-
-
-def _hide_all_except_plot() -> None:
-    """Скрывает содержимое всех кнопок, кроме 'График'."""
-    st.session_state.insert_state = False
-    st.session_state.change_state = False
-    st.session_state.output_state = False
-    st.session_state.clear_state = False
-    st.session_state.random_state = False
-
-
-def _hide_all_except_random() -> None:
-    """Скрывает содержимое всех кнопок, кроме 'Случайные данные'."""
-    st.session_state.insert_state = False
-    st.session_state.change_state = False
-    st.session_state.output_state = False
-    st.session_state.plot_state = False
-    st.session_state.clear_state = False
-
-
-def _hide_all_except_clear() -> None:
-    """Скрывает содержимое всех кнопок, кроме 'Очистить'."""
-    st.session_state.insert_state = False
-    st.session_state.change_state = False
-    st.session_state.output_state = False
-    st.session_state.plot_state = False
-    st.session_state.random_state = False
+def hide_others_states(unique_state: str) -> None:
+    for state in STATES:
+        if state != unique_state:
+            setattr(st.session_state, state, False)
 
 
 with stylable_container(
     "green",
     css_styles=INSERT_BUTTON_CSS_STYLE,
 ):
-    insert = st.button("Ввести", on_click=_hide_all_except_insert)
+    insert = st.button("Ввести", on_click=lambda: hide_others_states("insert_state"))
 
 if insert or st.session_state.insert_state:
     st.session_state.insert_state = True
@@ -101,7 +45,7 @@ with stylable_container(
     "red",
     css_styles=CHANGE_BUTTON_CSS_STYLE,
 ):
-    change = st.button("Изменить", on_click=_hide_all_except_change)
+    change = st.button("Изменить", on_click=lambda: hide_others_states("change_state"))
 
 if change or st.session_state.change_state:
     st.session_state.change_state = True
@@ -111,7 +55,7 @@ with stylable_container(
     "blue",
     css_styles=OUTPUT_BUTTON_CSS_STYLE,
 ):
-    output = st.button("Вывести", on_click=_hide_all_except_output)
+    output = st.button("Вывести", on_click=lambda: hide_others_states("output_state"))
 
 if output or st.session_state.output_state:
     st.session_state.output_state = True
@@ -121,7 +65,7 @@ with stylable_container(
     "orange",
     css_styles=PLOT_BUTTON_CSS_STYLE,
 ):
-    plot = st.button("График", on_click=_hide_all_except_plot)
+    plot = st.button("График", on_click=lambda: hide_others_states("plot_state"))
 
 if plot or st.session_state.plot_state:
     st.session_state.plot_state = True
@@ -131,7 +75,9 @@ with stylable_container(
     "pink",
     css_styles=RANDOM_BUTTON_CSS_STYLE,
 ):
-    random = st.button("Случайные данные", on_click=_hide_all_except_random)
+    random = st.button(
+        "Случайные данные", on_click=lambda: hide_others_states("random_state")
+    )
 
 if random or st.session_state.random_state:
     st.session_state.random_state = True
@@ -142,9 +88,9 @@ with stylable_container(
     "dark",
     css_styles=CLEAR_BUTTON_CSS_STYLE,
 ):
-    clear = st.button("Очистить", on_click=_hide_all_except_clear)
+    clear = st.button("Очистить", on_click=lambda: hide_others_states("clear_state"))
 
 if clear or st.session_state.clear_state:
     st.session_state.clear_state = True
     st.session_state["fruit_frame"].clear()
-    st.success("Таблица очищена")
+    st.success("Таблица очищена.")

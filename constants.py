@@ -1,18 +1,6 @@
 import pandas as pd
 
-DAYS_SERIES = pd.Series(
-    {
-        "Понедельник": 0,
-        "Вторник": 1,
-        "Среда": 2,
-        "Четверг": 3,
-        "Пятница": 4,
-        "Суббота": 5,
-        "Воскресенье": 6,
-    }
-)
-
-DAYS_LIST = [
+DAYS_LIST = (
     "Понедельник",
     "Вторник",
     "Среда",
@@ -20,20 +8,18 @@ DAYS_LIST = [
     "Пятница",
     "Суббота",
     "Воскресенье",
-]
-TREES = ("Яблоня", "Слива", "Груша", "Вишня", "Черешня", "Персик")
-
-DAYS_FOR_RADIO_BUTTON = (
-    (
-        "Понедельник",
-        "Вторник",
-        "Среда",
-        "Четверг",
-        "Пятница",
-        "Суббота",
-        "Воскресенье",
-    ),
 )
+DAYS_SERIES = pd.Series({DAYS_LIST[i]: i for i in range(7)})
+TREES = ("Яблоня", "Слива", "Груша", "Вишня", "Черешня", "Персик")
+STATES = (
+    "insert_state",
+    "change_state",
+    "output_state",
+    "plot_state",
+    "random_state",
+    "clear_state",
+)
+DEFAULT_SLEEP_TIME = 2
 
 INSERT_BUTTON_CSS_STYLE = """
     button {

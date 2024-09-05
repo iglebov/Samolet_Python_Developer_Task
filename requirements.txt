@@ -1,5 +1,5 @@
 streamlit==1.38.0
 streamlit-extras==0.4.7
-streamlit-dynamic-filters==0.1.9
+# streamlit-dynamic-filters==0.1.9
 pandas==2.2.2
 watchdog==4.0.2

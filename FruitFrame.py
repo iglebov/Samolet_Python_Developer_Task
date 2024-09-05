@@ -1,11 +1,12 @@
 import random
+import time
 
 import altair as alt
 import pandas as pd
 import streamlit
-from streamlit_dynamic_filters import DynamicFilters
 
-from constants import DAYS_FOR_RADIO_BUTTON, DAYS_LIST, DAYS_SERIES, TREES
+from constants import DAYS_LIST, DAYS_SERIES, DEFAULT_SLEEP_TIME, TREES
+from dynamic_filters import DynamicFilters
 
 
 class FruitFrame:
@@ -19,19 +20,16 @@ class FruitFrame:
         with st.form(key="fruits_info"):
             day_name = st.radio(
                 "День недели",
-                *DAYS_FOR_RADIO_BUTTON,
+                *[DAYS_LIST],
             )
             tree_name = st.text_input(label="Название дерева (Например: Яблоня)")
-            fruits_number = st.number_input(
-                label="Число плодов (Например: 1)", min_value=1, value=1
-            )
+            fruits_number = st.number_input(label="Число плодов (Например: 1)", step=1)
 
             submit_form = st.form_submit_button(label="Добавить информацию")
-
             if submit_form:
-                st.write(submit_form)
-
-                if tree_name:
+                if fruits_number is None or fruits_number < -1:
+                    st.warning("Пожалуйста, укажите число плодов 0 и больше!")
+                elif tree_name:
                     series = pd.Series(
                         {
                             "День недели": day_name,
@@ -40,9 +38,13 @@ class FruitFrame:
                         }
                     )
                     self.insert(series)
-                    st.success("Информация успешно добавлена!")
+                    success = st.success("Информация успешно добавлена!")
+                    time.sleep(DEFAULT_SLEEP_TIME)
+                    success.empty()
                 else:
-                    st.warning("Пожалуйста, заполните все поля.")
+                    warning = st.warning("Пожалуйста, заполните все поля.")
+                    time.sleep(DEFAULT_SLEEP_TIME)
+                    warning.empty()
 
     def insert(self, series: pd.Series) -> None:
         updated_data = pd.concat(
@@ -64,7 +66,7 @@ class FruitFrame:
         df = DynamicFilters(
             self.data, filters=["День недели", "Название дерева", "Кол-во фруктов"]
         )
-        df.display_filters()
+        df.display_filters(select=False)
         df.display_df(hide_index=True, use_container_width=True)
 
     def plot(self, state: streamlit) -> None:
@@ -86,7 +88,7 @@ class FruitFrame:
                     {
                         "День недели": random.choice(DAYS_LIST),
                         "Название дерева": random.choice(TREES),
-                        "Кол-во фруктов": random.randrange(1, 50),
+                        "Кол-во фруктов": random.randrange(0, 50),
                     }
                 )
             )
