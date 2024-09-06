@@ -4,11 +4,13 @@ import psycopg2
 
 
 class DBWorker:
-    def __init__(self, user, host, port, password, database):
+    def __init__(self, user: str, host: str, port: str, password: str, database: str):
         self.connection = self.connect(user, host, port, password, database)
 
     @staticmethod
-    def connect(user, host, port, password, database):
+    def connect(user: str, host: str, port: str, password: str, database: str):
+        st
+        # st.connect(...)
         return psycopg2.connect(
             user=user, host=host, port=port, password=password, database=database
         )

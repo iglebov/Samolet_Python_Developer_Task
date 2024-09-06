@@ -9,6 +9,14 @@ DAYS_LIST = (
     "Суббота",
     "Воскресенье",
 )
+BUTTONS_NAMES = {
+    "insert_state": "Ввести",
+    "change_state": "Изменить",
+    "output_state": "Вывести",
+    "plot_state": "График",
+    "random_state": "Случайные данные",
+    "clear_state": "Очистить",
+}
 DAYS_SERIES = pd.Series({DAYS_LIST[i]: i for i in range(7)})
 TREES = ("Яблоня", "Слива", "Груша", "Вишня", "Черешня", "Персик")
 STATES = (
@@ -19,64 +27,12 @@ STATES = (
     "random_state",
     "clear_state",
 )
+HTML_COLORS = {
+    "green": "A4ff96",
+    "red": "FF96A4",
+    "blue": "96A4FF",
+    "orange": "F2C822",
+    "pink": "DC82DA",
+    "dark": "998BCF",
+}
 DEFAULT_SLEEP_TIME = 2
-
-INSERT_BUTTON_CSS_STYLE = """
-    button {
-        display: block;
-        margin: auto;
-        height: 80px;
-        width: 200px;
-        background-color: #A4ff96;
-        color: black;
-    }"""
-
-CHANGE_BUTTON_CSS_STYLE = """
-    button {
-        display: block;
-        margin: auto;
-        height: 80px;
-        width: 200px;
-        background-color: #FF96A4;
-        color: black;
-    }"""
-
-OUTPUT_BUTTON_CSS_STYLE = """
-    button {
-        display: block;
-        margin: auto;
-        height: 80px;
-        width: 200px;
-        background-color: #96A4FF;
-        color: black;
-    }"""
-
-PLOT_BUTTON_CSS_STYLE = """
-    button {
-        display: block;
-        margin: auto;
-        height: 80px;
-        width: 200px;
-        background-color: #F2C822;
-        color: black;
-    }"""
-
-RANDOM_BUTTON_CSS_STYLE = """
-    button {
-        display: block;
-        margin: auto;
-        height: 80px;
-        width: 200px;
-        background-color: #DC82DA;
-        color: black;
-    }"""
-
-CLEAR_BUTTON_CSS_STYLE = """
-    button {
-        display: block;
-        margin: auto;
-        height: 80px;
-        width: 200px;
-        background-color: #998BCF;
-        color: black;
-    }"""
