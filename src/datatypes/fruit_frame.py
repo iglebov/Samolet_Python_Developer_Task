@@ -5,8 +5,8 @@ import altair as alt
 import pandas as pd
 import streamlit
 
-from constants import DAYS_LIST, DAYS_SERIES, DEFAULT_SLEEP_TIME, TREES
-from dynamic_filters import DynamicFilters
+from src.constants import DAYS_LIST, DAYS_SERIES, DEFAULT_SLEEP_TIME, TREES
+from src.dynamic_filters import DynamicFilters
 
 
 class FruitFrame:
