@@ -4,4 +4,3 @@ psycopg2-binary==2.9.9
 pandas==2.2.2
 watchdog==4.0.2
 SQLAlchemy==2.0.34
-scipy==1.14.1
