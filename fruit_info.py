@@ -5,7 +5,6 @@ from src.datatypes.fruit_frame import FruitFrame
 from src.helpers.button_helper import ButtonHelper
 
 _, col, _ = st.columns([1, 4, 1])
-
 with col:
     st.title("Информация о плодах")
 
