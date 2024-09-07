@@ -10,8 +10,7 @@ with col:
     st.title("Информация о плодах")
 
 if "fruit_frame" not in st.session_state:
-    st.session_state["fruit_frame"] = FruitFrame()
-if "button_helper" not in st.session_state:
+    st.session_state["fruit_frame"] = FruitFrame(st)
     st.session_state["button_helper"] = ButtonHelper(st)
 
 for state in STATES:
@@ -21,12 +20,12 @@ for state in STATES:
 insert = st.session_state["button_helper"].create_button("green", "insert_state")
 if insert or st.session_state.insert_state:
     st.session_state.insert_state = True
-    st.session_state["fruit_frame"].form(st)
+    st.session_state["fruit_frame"].form()
 
 change = st.session_state["button_helper"].create_button("red", "change_state")
 if change or st.session_state.change_state:
     st.session_state.change_state = True
-    st.session_state["fruit_frame"].change(st)
+    st.session_state["fruit_frame"].change()
 
 output = st.session_state["button_helper"].create_button("blue", "output_state")
 if output or st.session_state.output_state:
@@ -36,7 +35,7 @@ if output or st.session_state.output_state:
 plot = st.session_state["button_helper"].create_button("orange", "plot_state")
 if plot or st.session_state.plot_state:
     st.session_state.plot_state = True
-    st.session_state["fruit_frame"].plot(st)
+    st.session_state["fruit_frame"].plot()
 
 random = st.session_state["button_helper"].create_button("pink", "random_state")
 if random or st.session_state.random_state:

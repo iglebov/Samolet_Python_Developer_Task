@@ -14,5 +14,5 @@
 - [x] st.markdown устаревшая конструкция, больше не используется
 - [x] При введении данных выводится текст «True»
 - [x] В начале названий фильтров стоит Select (особенности библиотеки streamlit dynamic filters)
-- [ ] График лучше сделать линейным и пошире
+- [x] График лучше сделать линейным и пошире (https://docs.streamlit.io/develop/api-reference/charts/st.plotly_chart)
 - [ ] Добавить тесты (для БД + для FruitFrame)

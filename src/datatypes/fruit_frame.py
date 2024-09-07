@@ -1,8 +1,8 @@
 import random
 import time
 
-import altair as alt
 import pandas as pd
+import plotly.express as px
 import streamlit
 
 from src.constants import DAYS_LIST, DAYS_SERIES, DEFAULT_SLEEP_TIME, TREES
@@ -10,25 +10,28 @@ from src.dynamic_filters import DynamicFilters
 
 
 class FruitFrame:
-    def __init__(self):
+    def __init__(self, st: streamlit):
+        self.st = st
         self.data = pd.DataFrame(
             columns=["День недели", "Название дерева", "Кол-во фруктов"],
             data=[],
         )
 
-    def form(self, st: streamlit):
-        with st.form(key="fruits_info"):
-            day_name = st.radio(
+    def form(self) -> None:
+        with self.st.form(key="fruits_info"):
+            day_name = self.st.radio(
                 "День недели",
                 *[DAYS_LIST],
             )
-            tree_name = st.text_input(label="Название дерева (Например: Яблоня)")
-            fruits_number = st.number_input(label="Число плодов (Например: 1)", step=1)
+            tree_name = self.st.text_input(label="Название дерева (Например: Яблоня)")
+            fruits_number = self.st.number_input(
+                label="Число плодов (Например: 1)", step=1
+            )
 
-            submit_form = st.form_submit_button(label="Добавить информацию")
+            submit_form = self.st.form_submit_button(label="Добавить информацию")
             if submit_form:
                 if fruits_number is None or fruits_number < -1:
-                    st.warning("Пожалуйста, укажите число плодов 0 и больше!")
+                    self.st.warning("Пожалуйста, укажите число плодов 0 и больше!")
                 elif tree_name:
                     series = pd.Series(
                         {
@@ -38,11 +41,11 @@ class FruitFrame:
                         }
                     )
                     self.insert(series)
-                    success = st.success("Информация успешно добавлена!")
+                    success = self.st.success("Информация успешно добавлена!")
                     time.sleep(DEFAULT_SLEEP_TIME)
                     success.empty()
                 else:
-                    warning = st.warning("Пожалуйста, заполните все поля.")
+                    warning = self.st.warning("Пожалуйста, заполните все поля.")
                     time.sleep(DEFAULT_SLEEP_TIME)
                     warning.empty()
 
@@ -69,24 +72,18 @@ class FruitFrame:
         df.display_filters(select=False)
         df.display_df(hide_index=True, use_container_width=True)
 
-    def plot(self, state: streamlit) -> None:
-        state.write(
-            alt.Chart(self.data)
-            .mark_bar()
-            .encode(
-                x=alt.X("День недели", sort=None, title="День недели"),
-                y=alt.Y("Кол-во фруктов", title="Кол-во фруктов"),
-                color="Название дерева",
-            ),
-            use_container_width=True,
+    def plot(self) -> None:
+        fig = px.line(
+            self.data, x="День недели", y="Кол-во фруктов", color="Название дерева"
         )
+        self.st.plotly_chart(fig, use_container_width=True)
 
     def random(self) -> None:
-        for i in range(10):
+        for day in DAYS_LIST:
             self.insert(
                 pd.Series(
                     {
-                        "День недели": random.choice(DAYS_LIST),
+                        "День недели": day,
                         "Название дерева": random.choice(TREES),
                         "Кол-во фруктов": random.randrange(0, 50),
                     }

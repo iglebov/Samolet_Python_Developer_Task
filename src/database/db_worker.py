@@ -9,14 +9,13 @@ class DBWorker:
 
     @staticmethod
     def connect(user: str, host: str, port: str, password: str, database: str):
-        st
         # st.connect(...)
         return psycopg2.connect(
             user=user, host=host, port=port, password=password, database=database
         )
 
     def insert_row(self, fruit_info: Dict[str, Union[str, list]]) -> None:
-        postgres_insert_query = """INSERT INTO fruits (day, tree_name, fruits_number)
+        postgres_insert_query = """INSERT INTO fruits_info (day, tree_name, fruits_number)
                                 VALUES (%s, %s, %s);"""
         record_to_insert = (
             fruit_info.get("day"),
