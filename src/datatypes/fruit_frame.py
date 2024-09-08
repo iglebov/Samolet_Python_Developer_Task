@@ -16,6 +16,7 @@ from src.constants import (
 )
 from src.database.db_worker import DBworker
 from src.dynamic_filters import DynamicFilters
+from src.weather.weather_parser import WeatherParser
 
 
 class FruitFrame:
@@ -45,6 +46,9 @@ class FruitFrame:
                             "День недели": day_name,
                             "Название дерева": tree_name.strip(),
                             "Кол-во фруктов": fruits_number,
+                            "Средняя температура": WeatherParser.get_weather()[
+                                day_name
+                            ],
                         }
                     )
                     self.insert(fruit_info)
@@ -100,6 +104,7 @@ class FruitFrame:
                         "День недели": day,
                         "Название дерева": random.choice(TREES),
                         "Кол-во фруктов": random.randrange(0, 50),
+                        "Средняя температура": random.uniform(0, 30),
                     }
                 )
             )

@@ -23,12 +23,16 @@ class DBworker:
                 "day": "День недели",
                 "tree_name": "Название дерева",
                 "fruits_number": "Кол-во фруктов",
+                "temperature": "Средняя температура",
             }
         )
 
     def insert(self, fruit_info: pd.Series) -> None:
-        insert_query = f"""INSERT INTO fruits_info (day, tree_name, fruits_number)
-        VALUES ('{fruit_info["День недели"]}', '{fruit_info["Название дерева"]}', {fruit_info["Кол-во фруктов"]});"""
+        insert_query = (
+            f"""INSERT INTO fruits_info (day, tree_name, fruits_number, temperature) VALUES """
+            f"""('{fruit_info["День недели"]}', '{fruit_info["Название дерева"]}',  """
+            f"""{fruit_info["Кол-во фруктов"]}, {fruit_info["Средняя температура"]});"""
+        )
         cursor = self.connection.cursor()
         cursor.execute(insert_query)
         self.connection.commit()
