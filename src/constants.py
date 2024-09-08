@@ -1,6 +1,6 @@
 import pandas as pd
 
-DAYS_LIST = (
+DAYS_TUPLE = (
     "Понедельник",
     "Вторник",
     "Среда",
@@ -9,6 +9,12 @@ DAYS_LIST = (
     "Суббота",
     "Воскресенье",
 )
+COLUMNS = {
+    "День недели": "day",
+    "Название дерева": "tree_name",
+    "Кол-во фруктов": "fruits_number",
+}
+COLUMNS_LIST = ["День недели", "Название дерева", "Кол-во фруктов"]
 BUTTONS_NAMES = {
     "insert_state": "Ввести",
     "change_state": "Изменить",
@@ -17,7 +23,7 @@ BUTTONS_NAMES = {
     "random_state": "Случайные данные",
     "clear_state": "Очистить",
 }
-DAYS_SERIES = pd.Series({DAYS_LIST[i]: i for i in range(7)})
+DAYS_SERIES = pd.Series({DAYS_TUPLE[i]: i for i in range(7)})
 TREES = ("Яблоня", "Слива", "Груша", "Вишня", "Черешня", "Персик")
 STATES = (
     "insert_state",

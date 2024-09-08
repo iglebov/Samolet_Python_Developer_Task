@@ -38,12 +38,12 @@ class DBworker:
         update_column: str,
         new_value: Any,
         column_1: str,
-        value_1,
-        column_2,
-        value_2,
+        value_1: str | int,
+        column_2: str,
+        value_2: str | int,
     ) -> None:
-        update_query = f"""UPDATE fruits_info SET {update_column} = {new_value}
-        WHERE {column_1} = {value_1} AND {column_2} = {value_2};"""
+        update_query = f"""UPDATE fruits_info SET {update_column} = '{new_value}'
+        WHERE {column_1} = '{value_1}' AND {column_2} = '{value_2}';"""
         cursor = self.connection.cursor()
         cursor.execute(update_query)
         self.connection.commit()
