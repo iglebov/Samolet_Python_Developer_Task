@@ -3,6 +3,7 @@ from typing import Any
 import pandas as pd
 import psycopg2
 import streamlit as st
+from pandas import DataFrame
 
 
 class DBworker:
@@ -25,22 +26,18 @@ class DBworker:
             }
         )
 
-    def is_duplicate(self, fruit_info: pd.Series) -> bool:
-        return (
-            not pd.read_sql(
-                f"SELECT * FROM fruits_info WHERE day = '{fruit_info["День недели"]}' "
-                f"AND tree_name = '{fruit_info["Название дерева"]}'",
-                self.connection,
-            )
-            .rename(
-                columns={
-                    "day": "День недели",
-                    "tree_name": "Название дерева",
-                    "fruits_number": "Кол-во фруктов",
-                    "temperature": "Средняя температура",
-                }
-            )
-            .empty
+    def select_row(self, fruit_info: pd.Series) -> DataFrame:
+        return pd.read_sql(
+            f"SELECT * FROM fruits_info WHERE day = '{fruit_info["День недели"]}' "
+            f"AND tree_name = '{fruit_info["Название дерева"]}'",
+            self.connection,
+        ).rename(
+            columns={
+                "day": "День недели",
+                "tree_name": "Название дерева",
+                "fruits_number": "Кол-во фруктов",
+                "temperature": "Средняя температура",
+            }
         )
 
     def insert(self, fruit_info: pd.Series) -> None:
@@ -58,12 +55,14 @@ class DBworker:
         update_column: str,
         new_value: Any,
         column_1: str,
-        value_1: str | int,
+        value_1: str | int | float,
         column_2: str,
-        value_2: str | int,
+        value_2: str | int | float,
+        column_3: str,
+        value_3: str | int | float,
     ) -> None:
         update_query = f"""UPDATE fruits_info SET {update_column} = '{new_value}'
-        WHERE {column_1} = '{value_1}' AND {column_2} = '{value_2}';"""
+        WHERE {column_1} = '{value_1}' AND {column_2} = '{value_2}' AND {column_3} = '{value_3}';"""
         cursor = self.connection.cursor()
         cursor.execute(update_query)
         self.connection.commit()

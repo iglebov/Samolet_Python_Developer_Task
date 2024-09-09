@@ -5,7 +5,14 @@ import pandas as pd
 import plotly.express as px
 import streamlit
 
-from src.constants import COLUMNS, COLUMNS_LIST, DAYS_SERIES, DAYS_TUPLE, TREES
+from src.constants import (
+    COLUMNS,
+    COLUMNS_LIST,
+    DAYS_DICT,
+    DAYS_SERIES,
+    DAYS_TUPLE,
+    TREES,
+)
 from src.database.db_worker import DBworker
 from src.dynamic_filters import DynamicFilters
 from src.weather.weather_parser import WeatherParser
@@ -51,7 +58,8 @@ class FruitFrame:
                     self.st.success("Информация успешно добавлена!")
 
     def insert(self, fruit_info: pd.Series) -> None:
-        if self.db.is_duplicate(fruit_info):
+        similar_row = self.db.select_row(fruit_info)
+        if not similar_row.empty:
             self.db.update(
                 update_column="fruits_number",
                 new_value=fruit_info["Кол-во фруктов"],
@@ -59,6 +67,8 @@ class FruitFrame:
                 value_1=fruit_info["День недели"],
                 column_2="tree_name",
                 value_2=fruit_info["Название дерева"],
+                column_3="temperature",
+                value_3=similar_row["Средняя температура"][0],
             )
             self.data = self.db.select().sort_values(
                 by="День недели", key=lambda day: DAYS_SERIES[day]
@@ -95,6 +105,9 @@ class FruitFrame:
         df.display_df(hide_index=True, use_container_width=True)
 
     def plot(self) -> None:
+        self.data = self.db.select().sort_values(
+            by="День недели", key=lambda day: DAYS_SERIES[day]
+        )
         fig = px.line(
             self.data, x="День недели", y="Кол-во фруктов", color="Название дерева"
         )
@@ -136,6 +149,8 @@ class FruitFrame:
             elif re.findall(r"\d", value):
                 self.st.warning("Пожалуйста, укажите название дерева без цифр.")
                 return False
+        elif column == "Средняя температура":
+            edit_info[row][column] = float(value)
         return True
 
     def _get_data_for_update(self) -> tuple:
@@ -143,11 +158,12 @@ class FruitFrame:
         update_row = tuple(edit_info)[0]
         update_column = tuple(edit_info[update_row])[0]
         new_value = edit_info[update_row][update_column]
-        column_1, column_2 = [
+        column_1, column_2, column_3 = [
             column for column in COLUMNS_LIST if column != update_column
         ]
         value_1 = self.data.iloc[update_row][column_1]
         value_2 = self.data.iloc[update_row][column_2]
+        value_3 = self.data.iloc[update_row][column_3]
         return (
             COLUMNS[update_column],
             new_value,
@@ -155,4 +171,6 @@ class FruitFrame:
             value_1,
             COLUMNS[column_2],
             value_2,
+            COLUMNS[column_3],
+            value_3,
         )
