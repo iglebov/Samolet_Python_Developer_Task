@@ -1,19 +1,11 @@
 import random
 import re
-import time
 
 import pandas as pd
 import plotly.express as px
 import streamlit
 
-from src.constants import (
-    COLUMNS,
-    COLUMNS_LIST,
-    DAYS_SERIES,
-    DAYS_TUPLE,
-    DEFAULT_SLEEP_TIME,
-    TREES,
-)
+from src.constants import COLUMNS, COLUMNS_LIST, DAYS_SERIES, DAYS_TUPLE, TREES
 from src.database.db_worker import DBworker
 from src.dynamic_filters import DynamicFilters
 from src.weather.weather_parser import WeatherParser
@@ -40,7 +32,11 @@ class FruitFrame:
             if submit_form:
                 if fruits_number is None or fruits_number < 0:
                     self.st.warning("Пожалуйста, укажите неотрицательное число плодов!")
-                elif tree_name:
+                elif not tree_name.strip():
+                    self.st.warning("Пожалуйста, укажите корректное название дерева.")
+                elif re.findall(r"\d", tree_name):
+                    self.st.warning("Пожалуйста, укажите название дерева без цифр.")
+                else:
                     fruit_info = pd.Series(
                         {
                             "День недели": day_name,
@@ -52,35 +48,43 @@ class FruitFrame:
                         }
                     )
                     self.insert(fruit_info)
-
-                    success = self.st.success("Информация успешно добавлена!")
-                    time.sleep(DEFAULT_SLEEP_TIME)
-                    success.empty()
-                else:
-                    warning = self.st.warning("Пожалуйста, заполните все поля.")
-                    time.sleep(DEFAULT_SLEEP_TIME)
-                    warning.empty()
+                    self.st.success("Информация успешно добавлена!")
 
     def insert(self, fruit_info: pd.Series) -> None:
-        self.db.insert(fruit_info)
-        updated_data = pd.concat(
-            [self.data, pd.DataFrame([fruit_info], columns=fruit_info.index)]
-        )
-        self.data = updated_data.sort_values(
-            by="День недели", key=lambda day: DAYS_SERIES[day]
-        )
+        if self.db.is_duplicate(fruit_info):
+            self.db.update(
+                update_column="fruits_number",
+                new_value=fruit_info["Кол-во фруктов"],
+                column_1="day",
+                value_1=fruit_info["День недели"],
+                column_2="tree_name",
+                value_2=fruit_info["Название дерева"],
+            )
+            self.data = self.db.select().sort_values(
+                by="День недели", key=lambda day: DAYS_SERIES[day]
+            )
+        else:
+            self.db.insert(fruit_info)
+            updated_data = pd.concat(
+                [self.data, pd.DataFrame([fruit_info], columns=fruit_info.index)]
+            )
+            self.data = updated_data.sort_values(
+                by="День недели", key=lambda day: DAYS_SERIES[day]
+            )
 
     def change(self) -> None:
-        self.st.data_editor(
+        obj = self.st.empty()
+        obj.data_editor(
             self.data, key="editor_key", hide_index=True, use_container_width=True
         )
         if self.st.session_state["editor_key"]["edited_rows"]:
             if self._data_validated():
                 data_for_update = self._get_data_for_update()
                 self.db.update(*data_for_update)
-                self.st.success("All good!")
+                self.st.success("Изменения внесены успешно!")
             else:
-                self.st.warning("Bad!")
+                obj.empty()
+                del self.st.session_state["editor_key"]
 
     def output(self) -> None:
         self.data = self.db.select().sort_values(
@@ -104,7 +108,7 @@ class FruitFrame:
                         "День недели": day,
                         "Название дерева": random.choice(TREES),
                         "Кол-во фруктов": random.randrange(0, 50),
-                        "Средняя температура": random.uniform(0, 30),
+                        "Средняя температура": WeatherParser.get_weather()[day],
                     }
                 )
             )
@@ -152,16 +156,3 @@ class FruitFrame:
             COLUMNS[column_2],
             value_2,
         )
-
-        # Если уже существует, то обновляем количество плодов
-        # if (
-        #     (self.data["День недели"] == series["День недели"])
-        #     and (self.data["Название дерева"] == series["Название дерева"])
-        # ).any():
-        #     row_index = self.data.index[
-        #         self.data["День недели"] == "David"
-        #         and self.data["Название дерева"] == "..."
-        #     ].tolist()
-        #     self.data.iloc[row_index]["Кол-во плодов"] = series["Кол-во плодов"]
-        # Если не существует, то просто добавляем
-        # else:

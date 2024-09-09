@@ -6,9 +6,7 @@ import streamlit as st
 
 
 class DBworker:
-    def __init__(
-        self,
-    ):
+    def __init__(self):
         self.connection = psycopg2.connect(
             user=st.secrets["username"],
             host=st.secrets["host"],
@@ -25,6 +23,24 @@ class DBworker:
                 "fruits_number": "Кол-во фруктов",
                 "temperature": "Средняя температура",
             }
+        )
+
+    def is_duplicate(self, fruit_info: pd.Series) -> bool:
+        return (
+            not pd.read_sql(
+                f"SELECT * FROM fruits_info WHERE day = '{fruit_info["День недели"]}' "
+                f"AND tree_name = '{fruit_info["Название дерева"]}'",
+                self.connection,
+            )
+            .rename(
+                columns={
+                    "day": "День недели",
+                    "tree_name": "Название дерева",
+                    "fruits_number": "Кол-во фруктов",
+                    "temperature": "Средняя температура",
+                }
+            )
+            .empty
         )
 
     def insert(self, fruit_info: pd.Series) -> None:
