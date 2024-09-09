@@ -5,14 +5,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit
 
-from src.constants import (
-    COLUMNS,
-    COLUMNS_LIST,
-    DAYS_DICT,
-    DAYS_SERIES,
-    DAYS_TUPLE,
-    TREES,
-)
+from src.constants import COLUMNS, COLUMNS_LIST, DAYS_SERIES, DAYS_TUPLE, TREES
 from src.database.db_worker import DBworker
 from src.dynamic_filters import DynamicFilters
 from src.weather.weather_parser import WeatherParser
