@@ -12,30 +12,28 @@ from src.weather.weather_parser import WeatherParser
 
 
 class FruitFrame:
-    def __init__(self, st: streamlit):
-        self.st = st
+    def __init__(self):
         self.db = DBworker()
         self.data = self.db.select()
 
-    def form(self) -> None:
-        with self.st.form(key="fruits_info"):
-            day_name = self.st.radio(
+    @classmethod
+    def form(cls, st: streamlit) -> None:
+        with st.form(key="fruits_info"):
+            day_name = st.radio(
                 "День недели",
                 *[DAYS_TUPLE],
             )
-            tree_name = self.st.text_input(label="Название дерева (Например: Яблоня)")
-            fruits_number = self.st.number_input(
-                label="Число плодов (Например: 1)", step=1
-            )
+            tree_name = st.text_input(label="Название дерева (Например: Яблоня)")
+            fruits_number = st.number_input(label="Число плодов (Например: 1)", step=1)
 
-            submit_form = self.st.form_submit_button(label="Добавить информацию")
+            submit_form = st.form_submit_button(label="Добавить информацию")
             if submit_form:
                 if fruits_number is None or fruits_number < 0:
-                    self.st.warning("Пожалуйста, укажите неотрицательное число плодов!")
+                    st.warning("Пожалуйста, укажите неотрицательное число плодов!")
                 elif not tree_name.strip():
-                    self.st.warning("Пожалуйста, укажите корректное название дерева.")
+                    st.warning("Пожалуйста, укажите корректное название дерева.")
                 elif re.findall(r"\d", tree_name):
-                    self.st.warning("Пожалуйста, укажите название дерева без цифр.")
+                    st.warning("Пожалуйста, укажите название дерева без цифр.")
                 else:
                     fruit_info = pd.Series(
                         {
@@ -47,8 +45,8 @@ class FruitFrame:
                             ],
                         }
                     )
-                    self.insert(fruit_info)
-                    self.st.success("Информация успешно добавлена!")
+                    cls.insert(st, fruit_info)
+                    st.success("Информация успешно добавлена!")
 
     def insert(self, fruit_info: pd.Series) -> None:
         similar_row = self.db.select_row(fruit_info)
@@ -75,19 +73,19 @@ class FruitFrame:
                 by="День недели", key=lambda day: DAYS_SERIES[day]
             )
 
-    def change(self) -> None:
-        obj = self.st.empty()
+    def change(self, st: streamlit) -> None:
+        obj = st.empty()
         obj.data_editor(
             self.data, key="editor_key", hide_index=True, use_container_width=True
         )
-        if self.st.session_state["editor_key"]["edited_rows"]:
-            if self._data_validated():
-                data_for_update = self._get_data_for_update()
+        if st.session_state["editor_key"]["edited_rows"]:
+            if self._data_validated(st):
+                data_for_update = self._get_data_for_update(st)
                 self.db.update(*data_for_update)
-                self.st.success("Изменения внесены успешно!")
+                st.success("Изменения внесены успешно!")
             else:
                 obj.empty()
-                del self.st.session_state["editor_key"]
+                del st.session_state["editor_key"]
 
     def output(self) -> None:
         self.data = self.db.select().sort_values(
@@ -97,14 +95,14 @@ class FruitFrame:
         df.display_filters(select=False)
         df.display_df(hide_index=True, use_container_width=True)
 
-    def plot(self) -> None:
+    def plot(self, st: streamlit) -> None:
         self.data = self.db.select().sort_values(
             by="День недели", key=lambda day: DAYS_SERIES[day]
         )
         fig = px.line(
             self.data, x="День недели", y="Кол-во фруктов", color="Название дерева"
         )
-        self.st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True)
 
     def random(self) -> None:
         for day in DAYS_TUPLE:
@@ -123,31 +121,32 @@ class FruitFrame:
         self.data = self.data[0:0]
         self.db.clear()
 
-    def _data_validated(self) -> bool:
-        edit_info = self.st.session_state["editor_key"]["edited_rows"]
+    @staticmethod
+    def _data_validated(st: streamlit) -> bool:
+        edit_info = st.session_state["editor_key"]["edited_rows"]
         row = tuple(edit_info)[0]
         column = tuple(edit_info[row])[0]
         value = edit_info[row][column]
 
         if column == "День недели" and value not in DAYS_TUPLE:
-            self.st.warning("Пожалуйста, укажите корректный день недели.")
+            st.warning("Пожалуйста, укажите корректный день недели.")
             return False
         elif column == "Кол-во фруктов" and value < 0:
-            self.st.warning("Пожалуйста, укажите неотрицательное количество плодов.")
+            st.warning("Пожалуйста, укажите неотрицательное количество плодов.")
             return False
         elif column == "Название дерева":
             if not value.strip():
-                self.st.warning("Пожалуйста, укажите корректное название дерева.")
+                st.warning("Пожалуйста, укажите корректное название дерева.")
                 return False
             elif re.findall(r"\d", value):
-                self.st.warning("Пожалуйста, укажите название дерева без цифр.")
+                st.warning("Пожалуйста, укажите название дерева без цифр.")
                 return False
         elif column == "Средняя температура":
             edit_info[row][column] = float(value)
         return True
 
-    def _get_data_for_update(self) -> tuple:
-        edit_info = self.st.session_state["editor_key"]["edited_rows"]
+    def _get_data_for_update(self, st: streamlit) -> tuple:
+        edit_info = st.session_state["editor_key"]["edited_rows"]
         update_row = tuple(edit_info)[0]
         update_column = tuple(edit_info[update_row])[0]
         new_value = edit_info[update_row][update_column]

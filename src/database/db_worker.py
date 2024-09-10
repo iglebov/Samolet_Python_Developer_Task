@@ -41,11 +41,9 @@ class DBworker:
         )
 
     def insert(self, fruit_info: pd.Series) -> None:
-        insert_query = (
-            f"""INSERT INTO fruits_info (day, tree_name, fruits_number, temperature) VALUES """
-            f"""('{fruit_info["День недели"]}', '{fruit_info["Название дерева"]}',  """
-            f"""{fruit_info["Кол-во фруктов"]}, {fruit_info["Средняя температура"]});"""
-        )
+        insert_query = f"""INSERT INTO fruits_info (day, tree_name, fruits_number, temperature) VALUES
+            ('{fruit_info["День недели"]}', '{fruit_info["Название дерева"]}',
+            {fruit_info["Кол-во фруктов"]}, {fruit_info["Средняя температура"]});"""
         cursor = self.connection.cursor()
         cursor.execute(insert_query)
         self.connection.commit()
@@ -61,6 +59,7 @@ class DBworker:
         column_3: str,
         value_3: str | int | float,
     ) -> None:
+        # TODO: Передавать температуру и количество плодов без ''
         update_query = f"""UPDATE fruits_info SET {update_column} = '{new_value}'
         WHERE {column_1} = '{value_1}' AND {column_2} = '{value_2}' AND {column_3} = '{value_3}';"""
         cursor = self.connection.cursor()

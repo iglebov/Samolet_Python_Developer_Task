@@ -5,15 +5,14 @@ from src.constants import BUTTONS_NAMES, HTML_COLORS, STATES
 
 
 class ButtonHelper:
-    def __init__(self, st: streamlit):
-        self.st = st
-
-    def _hide_others_states(self, unique_state: str) -> None:
+    @staticmethod
+    def _hide_others_states(st: streamlit, unique_state: str) -> None:
         for state in STATES:
             if state != unique_state:
-                setattr(self.st.session_state, state, False)
+                st.session_state[state] = False
 
-    def create_button(self, color: str, state_name: str):
+    @classmethod
+    def create_button(cls, st: streamlit, color: str, state_name: str):
         with stylable_container(
             color,
             css_styles="""
@@ -26,7 +25,7 @@ class ButtonHelper:
             + f"background-color: #{HTML_COLORS[color]};"
             + "})",
         ):
-            return self.st.button(
+            return st.button(
                 BUTTONS_NAMES[state_name],
-                on_click=lambda: self._hide_others_states(state_name),
+                on_click=lambda: cls._hide_others_states(st, state_name),
             )
