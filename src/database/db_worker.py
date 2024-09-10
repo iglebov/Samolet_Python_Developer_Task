@@ -66,6 +66,19 @@ class DBworker:
         cursor.execute(update_query)
         self.connection.commit()
 
+    def update_duplicate(
+        self,
+        fruits_value: int,
+        temperature_value: float,
+        day_value: str,
+        tree_value: str,
+    ) -> None:
+        update_query = f"""UPDATE fruits_info SET fruits_number = {fruits_value}, temperature = {temperature_value}
+                           WHERE day = '{day_value}' AND tree_name = '{tree_value}';"""
+        cursor = self.connection.cursor()
+        cursor.execute(update_query)
+        self.connection.commit()
+
     @staticmethod
     def _get_value(value: str | int | float) -> str:
         if isinstance(value, (int, float)):

@@ -5,7 +5,14 @@ import pandas as pd
 import plotly.express as px
 import streamlit
 
-from src.constants import COLUMNS, COLUMNS_LIST, DAYS_SERIES, DAYS_TUPLE, TREES
+from src.constants import (
+    COLUMNS,
+    COLUMNS_LIST,
+    DAYS_DICT,
+    DAYS_SERIES,
+    DAYS_TUPLE,
+    TREES,
+)
 from src.database.db_worker import DBworker
 from src.dynamic_filters import DynamicFilters
 from src.weather.weather_parser import WeatherParser
@@ -50,15 +57,11 @@ class FruitFrame:
     def insert(self, fruit_info: pd.Series) -> None:
         similar_row = self.db.select_row(fruit_info)
         if not similar_row.empty:
-            self.db.update(
-                update_column="fruits_number",
-                new_value=fruit_info["Кол-во фруктов"],
-                column_1="day",
-                value_1=fruit_info["День недели"],
-                column_2="tree_name",
-                value_2=fruit_info["Название дерева"],
-                column_3="temperature",
-                value_3=similar_row["Средняя температура"][0].item(),
+            self.db.update_duplicate(
+                fruits_value=fruit_info["Кол-во фруктов"],
+                temperature_value=fruit_info["Средняя температура"],
+                day_value=fruit_info["День недели"],
+                tree_value=fruit_info["Название дерева"],
             )
             self.data = self.db.select().sort_values(
                 by="День недели", key=lambda day: DAYS_SERIES[day]
@@ -95,11 +98,18 @@ class FruitFrame:
         df.display_df(hide_index=True, use_container_width=True)
 
     def plot(self, st: streamlit) -> None:
-        self.data = self.db.select().sort_values(
-            by="День недели", key=lambda day: DAYS_SERIES[day]
-        )
+        self.data = self.db.select()
+
+        days_order = []
+        for day_name in self.data["День недели"]:
+            days_order.append(DAYS_DICT[day_name])
+        self.data["days_order"] = days_order
+
         fig = px.line(
-            self.data, x="День недели", y="Кол-во фруктов", color="Название дерева"
+            self.data.sort_values(by="days_order"),
+            x="День недели",
+            y="Кол-во фруктов",
+            color="Название дерева",
         )
         st.plotly_chart(fig, use_container_width=True)
 

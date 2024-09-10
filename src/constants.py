@@ -29,7 +29,8 @@ BUTTONS_NAMES = {
     "random_state": "Случайные данные",
     "clear_state": "Очистить",
 }
-DAYS_SERIES = pd.Series({DAYS_TUPLE[i]: i for i in range(7)})
+DAYS_DICT = {DAYS_TUPLE[i]: i for i in range(7)}
+DAYS_SERIES = pd.Series(DAYS_DICT)
 TREES = ("Яблоня", "Слива", "Груша", "Вишня", "Черешня", "Персик")
 STATES = (
     "insert_state",
