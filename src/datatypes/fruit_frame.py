@@ -16,8 +16,7 @@ class FruitFrame:
         self.db = DBworker()
         self.data = self.db.select()
 
-    @classmethod
-    def form(cls, st: streamlit) -> None:
+    def form(self, st: streamlit) -> None:
         with st.form(key="fruits_info"):
             day_name = st.radio(
                 "День недели",
@@ -45,7 +44,7 @@ class FruitFrame:
                             ],
                         }
                     )
-                    cls.insert(st, fruit_info)
+                    self.insert(fruit_info)
                     st.success("Информация успешно добавлена!")
 
     def insert(self, fruit_info: pd.Series) -> None:
@@ -59,7 +58,7 @@ class FruitFrame:
                 column_2="tree_name",
                 value_2=fruit_info["Название дерева"],
                 column_3="temperature",
-                value_3=similar_row["Средняя температура"][0],
+                value_3=similar_row["Средняя температура"][0].item(),
             )
             self.data = self.db.select().sort_values(
                 by="День недели", key=lambda day: DAYS_SERIES[day]

@@ -59,12 +59,19 @@ class DBworker:
         column_3: str,
         value_3: str | int | float,
     ) -> None:
-        # TODO: Передавать температуру и количество плодов без ''
-        update_query = f"""UPDATE fruits_info SET {update_column} = '{new_value}'
-        WHERE {column_1} = '{value_1}' AND {column_2} = '{value_2}' AND {column_3} = '{value_3}';"""
+        update_query = f"""UPDATE fruits_info SET {update_column} = {self._get_value(new_value)}
+                           WHERE {column_1} = {self._get_value(value_1)} AND {column_2} = {self._get_value(value_2)}
+                           AND {column_3} = {self._get_value(value_3)};"""
         cursor = self.connection.cursor()
         cursor.execute(update_query)
         self.connection.commit()
+
+    @staticmethod
+    def _get_value(value: str | int | float) -> str:
+        if isinstance(value, (int, float)):
+            return f"{value}"
+        else:
+            return f"'{value}'"
 
     def clear(self):
         cursor = self.connection.cursor()
