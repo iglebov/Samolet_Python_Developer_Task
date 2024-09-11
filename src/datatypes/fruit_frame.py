@@ -107,10 +107,20 @@ class FruitFrame:
 
         fig = px.line(
             self.data.sort_values(by="days_order"),
-            x="День недели",
+            x="days_order",
             y="Кол-во фруктов",
             color="Название дерева",
         )
+        fig.update_layout(
+            title="Plot Title",
+            xaxis_title="День недели",
+            xaxis=dict(
+                tickmode="array",
+                tickvals=[0, 1, 2, 3, 4, 5, 6],
+                ticktext=DAYS_TUPLE,
+            ),
+        )
+
         st.plotly_chart(fig, use_container_width=True)
 
     def random(self) -> None:
